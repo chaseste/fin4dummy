@@ -1,0 +1,114 @@
+{% extends "layout.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}
+	Sell
+{% endblock %}
+
+{% block main %}
+<div>
+	<form method="POST" action="/sell">
+		<div class="container-fluid">
+			<div class="row justify-content-center">
+				{{ form.csrf_token }}
+				{% if form.symbol.choices | length == 0 %}
+					{{ wtf.form_field(form.symbol, class='form-control', disabled=True) }}
+				{% else %}
+					{{ wtf.form_field(form.symbol, class='form-control') }}
+				{% endif %}
+			</div>
+			<div class="row justify-content-center">
+				<div class="col-auto">	
+					{{ wtf.form_field(form.pps, class='form-control', readonly="readonly") }}
+					{{ wtf.form_field(form.holding, class='form-control', readonly="readonly") }}
+				</div>
+				<div class="col-auto">
+					{{ wtf.form_field(form.price, class='form-control', readonly="readonly") }}		
+					{% if form.symbol.choices | length == 0 %}
+						{{ wtf.form_field(form.shares, class='form-control', disabled=True) }}
+					{% else %}
+						{{ wtf.form_field(form.shares, class='form-control', type='number', min='1', max=form.holding.data) }}
+					{% endif %}
+				</div>
+			</div>
+			<div class="row justify-content-center">
+				<div class="col-auto">
+					<p id="notification"></p>
+					<input id="submit" type="submit" class='btn btn-primary' value="Sell" {% if form.symbol.choices | length == 0 %} disabled {% endif %}>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+<script>
+	function updateHolding(id) {
+		var submit = document.getElementById('submit');
+		submit.disabled = true;
+
+		var notification = document.getElementById('notification');
+		notification.innerHTML = "";
+
+		var holding = document.getElementById('holding');
+		holding.value = "";
+
+		var price = document.getElementById('price');
+		price.value = "";
+
+		var pps = document.getElementById('pps');
+		pps.value = "";
+
+		var shares = document.getElementById('shares');
+		shares.value = "1";
+
+		$.ajax({
+			url: '/portfolio/holding?id=' + id,
+			dataType: "json",
+			headers: {
+				'Authorization':'Bearer {{session["jwt"]}}'
+			}
+		})
+		.done(function (data) {
+			holding.value = data.shares; 
+			price.value = formatNumber(data.price);
+			pps.value = formatNumber(data.pps);
+			submit.disabled = false;
+			shares.max = holding.value;
+
+			updateSellNotification(notification, price, pps, shares);
+		});
+	}
+
+	function updateSellNotification(notification, price, pps, shares) {
+		notification.className = notification.className.replace(/text-\D*/, "");
+		pps.className = pps.className.replace(/ text-\D*/, "");
+		shares.className = shares.className.replace(/ text-\D*/, "");
+
+		var change = currencyToNumber(price.value) - currencyToNumber(pps.value); 
+		var deltaPPS = Math.abs(change).toFixed(2);
+		if (change < 0.0) {
+			notification.innerHTML = "Selling will result in a loss of $" + deltaPPS + " a share.";
+			notification.className += "text-danger";
+			
+			pps.className += " text-danger";
+			shares.className += " text-danger";
+		} 
+		else if (change > 0.0) {
+			notification.innerHTML = "Selling will result in a gain of $" + deltaPPS + " a share.";
+			notification.className += "text-success";
+			
+			pps.className += " text-success";
+			shares.className += " text-success";
+		}
+	}	
+
+	$(function() {
+		updateSellNotification(document.querySelector('#notification'), document.querySelector('#price'), 
+			document.querySelector('#pps'), document.querySelector('#shares'));
+		document.querySelector('#symbol').addEventListener('change', function (evt) {
+			updateHolding(this.value);
+		});
+		$('#pps').currencyFormat();
+		$('#price').currencyFormat();
+	});
+</script>
+{% endblock %}

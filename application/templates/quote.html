@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}
+    Quote
+{% endblock %}
+
+{% block main %}
+	<div>
+	  <form id="quoteForm" method="POST" action="/quote">
+			{{ form.csrf_token }}
+			{{ wtf.form_field(form.symbol, class='form-control', maxlength='5') }}
+			<input type="submit" class='btn btn-primary' value="Quote">
+	  </form>
+	</div>
+	<script>
+		$(function() {
+			$.ajax({
+				url: '/market/suggested-symbols',
+				headers: {
+        			'Authorization':'Bearer {{session["jwt"]}}'
+				}
+				}).done(function (data) {
+					$('#symbol').autocomplete({
+						source: data,
+						minLength: 0,
+						position: {  collision: "flip"  },
+						select: function(event, ui) { 
+							$("#symbol").val(ui.item.label);
+							$("#quoteForm").submit(); 
+						}
+					});
+				});
+			});
+	</script>
+{% endblock %}

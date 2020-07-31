@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}
+	Register
+{% endblock %}
+
+{% block main %}
+<div class="row justify-content-center">
+	<div class="card borderless">
+		<div class="card-body">
+			<div class="pb-3">
+				<h4>Register Account</h4>
+			</div>
+			<p>Already have an account? <a href="/login"><u>Log In</u></a></p>
+			<form method="POST" action="/register">
+				<div class="container-fluid">
+					<div class="row justify-content-center">
+						{{ form.csrf_token }}
+						<div class="col-auto">
+							{{ wtf.form_field(form.first, class='text-left form-control') }}
+						</div>
+						<div class="col-auto">
+							{{ wtf.form_field(form.last, class='text-left form-control') }}
+						</div>
+					</div>
+					<div class="row justify-content-center">
+						{{ form.csrf_token }}
+						<div class="col-auto">
+							{{ wtf.form_field(form.username, class='text-left form-control', 
+								title='Usernames are case insensitive') }}
+						</div>
+						<div class="col-auto">
+							{{ wtf.form_field(form.email, class='text-left form-control') }}
+						</div>
+					</div>
+					<div class="row justify-content-center pt-2">
+						<div class="col-auto">
+							{{ wtf.form_field(form.password, class='text-left form-control',
+								title='Passwords should be between 6 and 64 characters.') }}
+						</div>
+						<div class="col-auto">
+							{{ wtf.form_field(form.confirm, class='text-left form-control',
+								title='Please confirm your password.') }}
+						</div>
+					</div>
+					<div class="row justify-content-center">
+						<div>
+							<span class="p-0 m-0" id="password-strength-text"></span>
+							<meter max="4" id="password-strength-meter"></meter>
+						</div>
+					</div>
+					<div class="row justify-content-center pt-3">
+						<input type="submit" class='btn btn-primary btn-lg' value="Register">
+					</div>
+			</form>
+		</div>
+	</div>
+</div>
+<script>
+	$('#password').passwordStrengthMeter();
+</script>
+{% endblock %}

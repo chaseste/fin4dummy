@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Position
+{% endblock %}
+
+{% block main %}
+<{% if desktop %}h4{% else %}h5{% endif %}><a href="/quote?symbol={{position["symbol"]}}">{{ position["name"] }}</a></{% if desktop %}h4{% else %}h5{% endif %}>
+<a href="/buy?symbol={{position["symbol"]}}">Buy</a>
+<a disabled href="/sell?symbol={{position["symbol"]}}">Sell</a>
+<div class="row">
+	<div class="card borderless">
+		<table class="table table-borderless table-responsive-md table-sm mt-2">
+			<thead>
+				<tr>
+					<th scope="col">Shares</th>
+					<th scope="col">PPS</th>
+				{% if desktop %}
+					<th scope="col">PPS-Chg</th>
+					<th scope="col">Price</th>
+					<th scope="col">Cost</th>
+				{% endif %}
+					<th scope="col">Gain/Loss</th>
+					<th scope="col">Value</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>{{ position["shares"] }}</td>
+					<td><div {% if position["ppsChange"] > 0 %} class="text-success" {% elif position["ppsChange"] < 0 %} class="text-danger" {% endif %}>{{ position["pps"] | usd }}</div></td>
+				{% if desktop %}					
+					<td><div {% if position["ppsChange"] > 0 %} class="text-success" {% elif position["ppsChange"] < 0 %} class="text-danger" {% endif %}>{{ position["ppsChange"] | usd }}</div></td>
+					<td><div {% if position["dayChange"] > 0 %} class="text-success" {% elif position["change"] < 0 %} class="text-danger" {% endif %}>{{ position["price"] | usd }}</div></td>
+					<td>{{ position["cost"] | usd }}</td>
+				{% endif %}
+					<td><div {% if position["change"] > 0 %} class="text-success" {% elif position["change"] < 0 %} class="text-danger" {% endif %}>{{ position["change"] | usd }}</div></td>
+					<td><div {% if position["change"] > 0 %} class="text-success" {% elif position["change"] < 0 %} class="text-danger" {% endif %}>{{ position["value"] | usd }}</div></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+{% endblock %}

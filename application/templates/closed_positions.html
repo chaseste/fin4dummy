@@ -1,0 +1,87 @@
+{% extends "layout.html" %}
+
+{% block title %}
+	Closed Positions
+{% endblock %}
+
+{% block main %}
+<div>
+    <table class="table table-striped table-sm">
+        <thead>
+          <tr>
+              <th scope="col">Position</th>
+              <th scope="col">Shares</th>
+          {% if desktop %}
+              <th scope="col">PPS</th>
+              <th scope="col">Price</th>
+          {% endif %}
+              <th scope="col">Date</th>
+          {% if desktop %}
+              <th scope="col">Cost</th>
+          {% endif %}
+              <th scope="col">Gain/Loss</th>
+          {% if desktop %}
+              <th scope="col">Value</th>  
+          {% endif %}
+          </tr>
+        </thead>
+        <tbody>
+      {% for symbol in positions %}
+          <tr>
+              <th scope="row">{{ symbol }}</th>
+              <td></td>
+              <td></td>
+              <td></td>
+          {% if desktop %}
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+          {% endif %}
+          </tr>
+          {% for position in positions[symbol] %}
+            <tr>
+                <th scope="row"></th>
+                <td>{{ position["shares"] }}</td>
+            {% if desktop %}
+                <td><div {% if position["change"] > 0 %} class="text-success" {% elif position["change"] < 0 %} class="text-danger" {% endif %}>{{ position["pps"] | usd }}</div></td>
+                <td><div {% if position["change"] > 0 %} class="text-success" {% elif position["change"] < 0 %} class="text-danger" {% endif %}>{{ position["price"] | usd }}</div></td>
+            {% endif %}
+                <td class="text-nowrap"><span class="localDtTm">{{ position["date"] }}</span></td>
+            {% if desktop %}
+                <td>{{ position["cost"] | usd }}</td>
+            {% endif %}
+                <td><div {% if position["change"] > 0 %} class="text-success" {% elif position["change"] < 0 %} class="text-danger" {% endif %}>{{ position["change"] | usd }}</div></td>
+            {% if desktop %}
+                <td><div {% if position["change"] > 0 %} class="text-success" {% elif position["change"] < 0 %} class="text-danger" {% endif %}>{{ position["value"] | usd }}</div></td>
+            {% endif %}                
+            </tr>
+          {% endfor %}
+      {% endfor %}
+            <tr>
+                <th scope="row"></th>
+                <td></td>
+                <td></td>
+            {% if desktop %}
+                <td></td>
+                <td></td>
+                <td>{{ cost | usd }}</td>
+            {% endif %}
+                <td><div {% if change > 0 %} class="text-success" {% elif change < 0 %} class="text-danger" {% endif %}>{{ change | usd }}</div></td>
+            {% if desktop %}
+                <td><div {% if change > 0 %} class="text-success" {% elif change < 0 %} class="text-danger" {% endif %}>{{ value | usd }}</div></td>
+            {% endif %}
+            </tr>
+        </tbody>
+      </table>
+      <div class="float-left">
+          <a href="/"><u>Current Positions</u></a>
+      </div>
+</div>
+<script>
+    var arr = document.getElementsByClassName('localDtTm');
+    for (var i=0; i < arr.length; i++) {
+        arr[i].innerHTML = moment.utc(arr[i].innerHTML).local().format('l');
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Quoted
+{% endblock %}
+
+{% block main %}
+<{% if desktop %}h4{% else %}h5{% endif %}><a href="https://finance.yahoo.com/quote/{{qoute["symbol"]}}">{{ qoute["name"] }}</a></{% if desktop %}h4{% else %}h5{% endif %}>
+<a href="/buy?symbol={{qoute["symbol"]}}">Buy</a>
+{% if share_holder == True %}
+<a disabled href="/sell?symbol={{qoute["symbol"]}}">Sell</a>
+{% endif %}
+<div class="row">
+	<div class="card borderless">
+		<table class="table table-borderless table-responsive-md table-sm mt-2">
+			<thead>
+				<tr>
+					<th scope="col">Symbol</th>
+					<th scope="col">Price</th>
+				{% if desktop %}
+					<th scope="col">Change</th>
+					<th scope="col">%</th>
+					<th scope="col">Open</th>
+					<th scope="col">Low</th>
+					<th scope="col">High</th>
+					<th scope="col">YTD %</th>
+					<th scope="col">P/E ratio</th>
+				{% endif %}
+					<th scope="col">52-Low</th>
+					<th scope="col">52-High</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>{{ qoute["symbol"] }}</td>
+					<td><div {% if qoute["change"] > 0 %} class="text-success" {% elif qoute["change"] < 0 %} class="text-danger" {% endif %}>{{ qoute["price"] | usd }}</div></td>
+				{% if desktop %}
+					<td><div {% if qoute["change"] > 0 %} class="text-success" {% elif qoute["change"] < 0 %} class="text-danger" {% endif %}>{{ qoute["change"] | usd }}</div></td>
+					<td><div {% if qoute["changePercent"] > 0 %} class="text-success" {% elif qoute["changePercent"] < 0 %} class="text-danger" {% endif %}>{{ qoute["changePercent"] }}</div></td>
+					<td>{{ qoute["open"] | usd }}</td>
+					<td>{{ qoute["low"] | usd }}</td>
+					<td>{{ qoute["high"] | usd }}</td>
+					<td><div {% if qoute["ytdChange"] > 0 %} class="text-success" {% elif qoute["ytdChange"] < 0 %} class="text-danger" {% endif %}>{{ qoute["ytdChange"] }}</div></td>
+					<td>{{ qoute["peRatio"] }}</td>
+				{% endif %}
+					<td>{{ qoute["52WeekLow"] | usd }}</td>
+					<td>{{ qoute["52WeekHigh"] | usd }}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+{% for headline in headlines %}
+<div class="row">
+	<div class="text-left">
+		<h6><a href="{{ headline["url"] }}">{{ headline["headline"] }}</a></h6>
+		<p class="text-left">{% if headline["src_lang"] != headline["lang"]  %}<b>(Translated)</b> {% endif %}{{ headline["summary"] }}</p>
+	</div>
+</div>
+{% endfor %}
+{% endblock %}

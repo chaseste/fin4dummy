@@ -1,0 +1,100 @@
+{% extends "layout.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}
+	Buy
+{% endblock %}
+
+{% block main %}
+	<div>
+		<form method="POST" action="/buy">
+				{{ form.csrf_token }}
+				<div class="form-group required">
+					<label class="control-label" for="symbol">Symbol</label>
+					<input class="form-control ui-autocomplete-input" id="symbol" name="symbol" required="" type="text" value="{{ form.symbol.data }}" autocomplete="off", maxlength='5'>
+					<p id="symbol-help" class="help-block"></p>
+				</div>
+				{{ wtf.form_field(form.price, class='form-control', readonly="readonly") }}
+				{{ wtf.form_field(form.cash, class='form-control', readonly="readonly") }}
+				{{ wtf.form_field(form.shares, class='form-control', type='number', min='1') }}
+				<div class="row justify-content-center">
+					<div class="col-auto">
+						<p id="notification" class="text-danger"></p>
+						<input id="submit" type="submit" class='btn btn-primary' value="Buy" {% if form.symbol.data == "" %} disabled {% endif %}>
+					</div>
+				</div>
+		</form>
+	</div>
+	<script>
+		function updatePrice(id) {
+			var submit = document.getElementById('submit');
+			submit.disabled = true;
+
+			var notification = document.getElementById('notification');
+			notification.innerHTML = "";
+
+			var price = document.getElementById('price');
+			price.value = "";
+
+			var help = document.getElementById('symbol-help');
+			help.innerHTML = ""
+
+			var shares = document.getElementById('shares');
+			shares.value = "";
+
+			if (id != "") {
+				$.ajax({
+					url: '/market/price?symbol=' + id,
+					headers: {
+        				'Authorization':'Bearer {{session["jwt"]}}'
+    				}
+				})
+				.fail(function(data) {
+					if (data.status == 400) {
+						help.innerHTML = 'Invalid Symbol.';
+					}
+				})
+				.done(function (data) {					
+					var cash = document.getElementById('cash');
+					shares.max = Math.floor(currencyToNumber(cash.value) / data);
+					if (shares.max == 0) {
+						shares.min = shares.max;
+						notification.innerHTML = "Not enough cash on hand.";
+					}
+					else {
+						shares.value = 1;
+						submit.disabled = false;
+					}
+					price.value = formatNumber(data);
+				});
+			}
+		}
+
+		$(function() {
+			document.querySelector('#symbol').addEventListener('change', function (evt) {
+				updatePrice(this.value);
+			});
+			$.ajax({
+				url: '/portfolio/holding-symbols',
+				headers: {
+        			'Authorization':'Bearer {{session["jwt"]}}'
+				}
+			}).done(function (data) {
+				$('#symbol').autocomplete({
+					source: data,
+					minLength: 0,
+					position: {  collision: "flip"  },
+					select: function(event, ui) {
+						var selection = ui.item ? ui.item.label : "";
+						if ($("#symbol").val() != selection) {
+							updatePrice(selection);
+						}
+					}}).focus(function() {
+							$(this).autocomplete('search', $(this).val())
+				});
+			});
+			$('#cash').currencyFormat();
+			$('#price').currencyFormat();
+		});
+	</script>
+{% endblock %}

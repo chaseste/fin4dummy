@@ -1,0 +1,166 @@
+{% extends "layout.html" %}
+
+{% block title %}
+	Insights
+{% endblock %}
+
+{% block main %}
+<div class="insight">
+    <div class="row">
+        <div class="col">
+            <div class="card borderless">
+                <div class="card-body">
+                    <canvas id="doughnut-chart" {% if not desktop %} style="width: 180px; height: 180px;" {% endif %}></canvas>
+                    <div class="legend"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card borderless">
+                <div class="card-body">
+                    <div class="header-picks">Most Active</div>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th scope="col">Symbol</th>
+                                <th scope="col">Price</th>
+                            {% if desktop %}
+                                <th scope="col">Change</th>
+                                <th scope="col">%</th>
+                            {% endif %}
+                                <th scope="col">Low</th>
+                                <th scope="col">High</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pick in active %}
+                                <tr>
+                                    <th scope="row"><a href="/quote?symbol={{pick["symbol"]}}">{{ pick["symbol"] }}</a></th>
+                                    <td><div {% if pick["change"] > 0 %} class="text-success" {% elif pick["change"] < 0 %} class="text-danger" {% endif %}>{{ pick["price"] | usd }}</div></td>
+                                {% if desktop %}
+                                    <td><div {% if pick["change"] > 0 %} class="text-success" {% elif pick["change"] < 0 %} class="text-danger" {% endif %}>{{ pick["change"] | usd }}</div></td>
+                                    <td><div {% if pick["changePercent"] > 0 %} class="text-success" {% elif pick["changePercent"] < 0 %} class="text-danger" {% endif %}>{{ pick["changePercent"] }}</div></td>
+                                {% endif %}
+                                    <td>{{ pick["low"] | usd }}</td>
+                                    <td>{{ pick["high"] | usd }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="card borderless">
+                <div class="card-body">
+                    <div class="header-picks">Biggest Gainers</div>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th scope="col">Symbol</th>
+                                <th scope="col">Price</th>
+                            {% if desktop %}
+                                <th scope="col">Change</th>
+                                <th scope="col">%</th>
+                            {% endif %}
+                                <th scope="col">Low</th>
+                                <th scope="col">High</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pick in gainers %}
+                                <tr>
+                                    <th scope="row"><a href="/quote?symbol={{pick["symbol"]}}">{{ pick["symbol"] }}</a></th>
+                                    <td><div {% if pick["change"] > 0 %} class="text-success" {% elif pick["change"] < 0 %} class="text-danger" {% endif %}>{{ pick["price"] | usd }}</div></td>
+                                {% if desktop %}
+                                    <td><div {% if pick["change"] > 0 %} class="text-success" {% elif pick["change"] < 0 %} class="text-danger" {% endif %}>{{ pick["change"] | usd }}</div></td>
+                                    <td><div {% if pick["changePercent"] > 0 %} class="text-success" {% elif pick["changePercent"] < 0 %} class="text-danger" {% endif %}>{{ pick["changePercent"] }}</div></td>
+                                {% endif %}
+                                    <td>{{ pick["low"] | usd }}</td>
+                                    <td>{{ pick["high"] | usd }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card borderless">
+                <div class="card-body">
+                    <div class="header-picks">Biggest Losers</div>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th scope="col">Symbol</th>
+                                <th scope="col">Price</th>
+                            {% if desktop %}
+                                <th scope="col">Change</th>
+                                <th scope="col">%</th>
+                            {% endif %}
+                                <th scope="col">Low</th>
+                                <th scope="col">High</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pick in losers %}
+                                <tr>
+                                    <th scope="row"><a href="/quote?symbol={{pick["symbol"]}}">{{ pick["symbol"] }}</a></th>
+                                    <td><div {% if pick["change"] > 0 %} class="text-success" {% elif pick["change"] < 0 %} class="text-danger" {% endif %}>{{ pick["price"] | usd }}</div></td>
+                                {% if desktop %}
+                                    <td><div {% if pick["change"] > 0 %} class="text-success" {% elif pick["change"] < 0 %} class="text-danger" {% endif %}>{{ pick["change"] | usd }}</div></td>
+                                    <td><div {% if pick["changePercent"] > 0 %} class="text-success" {% elif pick["changePercent"] < 0 %} class="text-danger" {% endif %}>{{ pick["changePercent"] }}</div></td>
+                                {% endif %}
+                                    <td>{{ pick["low"] | usd }}</td>
+                                    <td>{{ pick["high"] | usd }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>    
+    myDoughnutChart = new Chart(document.getElementById("doughnut-chart"), {
+        type: 'doughnut',
+        data: {
+            labels: [{% for item in labels %} "{{item}}", {% endfor %}],
+            datasets: [{
+                backgroundColor: [{% for item in labels %} getRandomColor(), {% endfor %}],
+                data: [{% for item in values %} "{{item}}", {% endfor %}]
+            }]
+        },
+        options: {
+            responsive: false,
+            title: {
+                display: true,
+                text: 'Account Distribution'
+            },
+            legend: {
+                display: false
+            },
+            tooltips: {
+                callbacks: {
+                    title: function(tooltipItem, data) {
+                        return data['labels'][tooltipItem[0]['index']];
+                    },
+                    label: function(tooltipItem, data) {
+                        return '$' + numeral(data['datasets'][0]['data'][tooltipItem['index']]).format('0,0');
+                    },
+                    afterLabel: function(tooltipItem, data) {
+                        var dataset = data['datasets'][0];
+                        var percent = Math.round((dataset['data'][tooltipItem['index']] / dataset["_meta"][0]['total']) * 100)
+                        return '(' + percent + '%)';
+                    }
+                }
+            }
+        }
+    });
+
+    $('.legend').append(myDoughnutChart.generateLegend());
+</script>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}
+    Log In
+{% endblock %}
+
+{% block main %}
+<div id="login" class="row justify-content-center">
+	<div class="card borderless">
+		<div class="card-body">
+			<div class="pb-3">
+				<h4>Log In</h4>
+			</div>
+			<p>Need an account? <a href="/register"><u>Register</u></a></p>
+			<form method="POST" action="/login">
+				{{ form.csrf_token }}
+				{{ wtf.form_field(form.username, class='text-left form-control') }}
+				<p><a href="/forgot-username"><u>Forgot Username?</u></a></p>
+				{{ wtf.form_field(form.password, class='text-left form-control') }}
+				<p><a href="/reset-password"><u>Forgot Password?</u></a></p>
+				<input type="submit" class='btn btn-primary' value="Log In">
+			</form>
+		</div>
+	</div>
+</div>
+{% endblock %}
+  

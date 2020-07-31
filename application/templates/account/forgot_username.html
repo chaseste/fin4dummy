@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}
+	Password Reset
+{% endblock %}
+
+{% block main %}
+<div class="row justify-content-center">
+	<div class="card borderless">
+		<div class="card-body">
+			<div class="pb-2">
+				<h4>Forgot Username</h4>
+			</div>
+			<div class="pb-2">
+				<p>Please enter your email below to receive an email with your username.</p>
+			</div>
+			<form method="POST" action="/forgot-username">
+				{{ form.csrf_token }}
+				{{ wtf.form_field(form.email, class='text-left form-control') }}
+				<input type="submit" class='btn btn-primary' value="Request">
+			</form>
+			<div class=pt-4>
+				<p><a href="/login"><u>Back to Login</u></a></p>
+			</div>  
+		</div>
+	</div>
+</div>
+{% endblock %}

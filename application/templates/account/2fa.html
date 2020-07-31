@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}
+    2FA
+{% endblock %}
+
+{% block main %}
+<div class="row justify-content-center">
+	<div class="card borderless">
+		<div class="card-body">
+			<div class="pb-2">
+				<h4>Two-Factor Auth (2FA)</h4>
+			</div>
+			<div class="pb-2">
+				<p>Add an extra layer of protection to your account. Once you enable 2FA, this account must enter verification codes.</p>
+			</div>
+			<form method="POST" action="/2fa">
+				{{ form.csrf_token }}
+				{{ wtf.form_field(form.enabled, class='form-control') }}
+				<div class="pt-2">
+					<input id="submit" type="submit" class='btn btn-primary' disabled value="Save">
+				</div>
+			</form>
+			<div class=pt-4>
+				<p><a href="/account"><u>Back to Account</u></a></p>
+			</div>  
+		</div>
+	</div>
+</div>
+<script>
+	var rad = document.getElementsByName("enabled");
+	var checked = null;
+	for (var i = 0; i < rad.length; i++) {
+		if (rad[i].checked) {
+			checked = rad[i]
+		}
+		rad[i].addEventListener('change', function() {
+			var submit = document.getElementById('submit');
+			submit.disabled = this.isSameNode(checked);
+		});
+	}
+</script>
+{% endblock %}

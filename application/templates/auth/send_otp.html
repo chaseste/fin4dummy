@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}
+	Send OTP
+{% endblock %}
+
+{% block main %}
+<div id="otp" class="row justify-content-center">
+	<div class="card borderless">
+		<div class="card-body">
+			<div class="pb-3">
+				<h4>Send Your OTP</h4>
+			</div>
+			<div class="pb-3">
+				<form method="POST" action="/send-otp?method=sms">
+					{{ form.csrf_token }}
+					{{ wtf.form_field(form.phone, class='text-left form-control', value="+1") }}
+					<input type="submit" class='btn btn-primary' value="Send">
+				</form>
+			</div>
+			<div class="pt-2">
+				<p><a href="/send-otp?method=mail"><u>Send an email instead?</u></a></p>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

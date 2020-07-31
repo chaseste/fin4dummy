@@ -1,0 +1,15 @@
+<html>
+    <body>
+        <h4>Was this you?</h4>
+        <p>Your account was accessed from an unrecognized location. If this was you there is no need to worry, 
+            otherwise your password may be compromized.</p>
+        <address>
+            {{ location['city'] }}, {{ location['region'] }}<br>
+            {{ location['country'] }}
+        </address>
+        <p><a href="http://maps.google.com/maps?q={{ location['loc'] }}">Map</a></p>
+        <h4>Wasn't you?</h4>
+        <p>Please follow this link to reset your password:</p>
+        <p><a href="{{ reset_url }}">Reset Password</a></p>
+    </body>
+</html>

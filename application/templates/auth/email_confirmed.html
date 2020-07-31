@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+
+{% block title %}
+	Email Confirmed
+{% endblock %}
+
+{% block main %}
+<container>
+	<h3>Thanks {{ first | capitalize }} for verifying your email!</h3>
+	<p>Please <a href="/login">login</a> to access your account.</p>
+</container>
+{% endblock %}

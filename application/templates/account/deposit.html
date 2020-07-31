@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}
+    Deposit
+{% endblock %}
+
+{% block main %}
+<div class="row justify-content-center">
+	<div class="card borderless">
+		<div class="card-body">
+			<div class="pb-2">
+				<h4>Deposit Cash</h4>
+			</div>
+			<div class="pb-2">
+				<p>Running low on cash? Select an amount to add to your account.</p>
+			</div>
+			<form method="POST" action="/deposit">
+				{{ form.csrf_token }}
+				{{ wtf.form_field(form.deposit, class='form-control') }}
+				<input type="submit" class='btn btn-primary' value="Add Deposit">
+			</form>
+			<div class=pt-4>
+				<p><a href="/account"><u>Back to Account</u></a></p>
+			</div>  
+		</div>
+	</div>
+</div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}
+	Verify OTP
+{% endblock %}
+
+{% block main %}
+<div id="otp" class="row justify-content-center">
+	<div class="card borderless">
+		<div class="card-body">
+			<div class="pb-3">
+				<h4>Verify Your OTP</h4>
+			</div>
+			<div class="pb-1">
+				<p>
+				{% if method == "sms" %}
+					Input the OTP sent to your phone number to access your account.
+				{% else %}
+					Please check your inbox (and your spam folder) - you should have received an email with your OTP.
+				{% endif %}
+					<br/>
+					Didn't get the message? <a href="/resend-otp?method={{method}}&dest={{dest}}">Resend</a>.
+				</p>
+			</div>
+			<div class="pb-2">
+				<form method="POST" action="/verify-otp?method={{method}}&dest={{dest}}">
+					{{ form.csrf_token }}
+					{{ wtf.form_field(form.otp, class='text-left form-control') }}
+					<input type="submit" class='btn btn-primary' value="Verify">
+				</form>
+			</div>
+			<div class="pt-3">
+				<p><a href="/send-otp"><u>Choose another method?</u></a></p>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

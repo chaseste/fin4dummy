@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+
+{% block title %}
+	History
+{% endblock %}
+
+{% block main %}
+<div>
+	<table class="table table-striped table-sm">
+	  <thead>
+		<tr>
+			<th scope="col">Position</th>
+			<th scope="col">Order</th>
+		{% if desktop %}
+			<th scope="col">Shares</th>
+			<th scope="col">Price</th>
+		{% endif %}
+			<th scope="col">Total</th>
+			<th scope="col">Transacted</th>
+		</tr>
+	  </thead>
+	  <tbody>
+		{% for transaction in transactions %}
+			<tr>
+				<th scope="row" class="text-nowrap">{{ transaction.symbol }}</th>
+				<td>{% if transaction.type == "BUY" %} Purchase {% elif transaction.type == "SELL" %} Sell {% else %} Deposit {% endif %}</td>
+			{% if desktop %}
+				<td>{{ transaction.shares }}</td>	
+				<td>{{ transaction.price | usd }}</td>
+			{% endif %}
+				<td>{{ transaction.cost | usd }}</td>
+				<td class="text-nowrap"><span class="localDtTm">{{ transaction.trans_dt_tm }}</span></td>
+			</tr>
+		{% endfor %}
+	  </tbody>
+	</table>
+	{% if prev_url %}
+		<a href="{{ prev_url }}"><i class="fas fa-chevron-left"></i></a>
+	{% endif %}
+	{% if next_url %}
+		<a href="{{ next_url }}"><i class="fas fa-chevron-right"></i></a>
+	{% endif %}
+</div>
+<script>
+	var format = {% if desktop %} 'lll' {% else %} 'l' {% endif %};
+	var arr = document.getElementsByClassName('localDtTm');
+	for (var i=0; i < arr.length; i++) {
+		arr[i].innerHTML = moment.utc(arr[i].innerHTML).local().format(format);
+	}
+</script>
+{% endblock %}
